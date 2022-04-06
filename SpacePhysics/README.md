@@ -14,11 +14,11 @@ Washy 2022-03-24
 
 ## Swarm卫星数据
 
-- 文件名：`SwarmData_Download02.py`
+- 文件名：`SwarmData_Download.py`
 
 ## Dst指数
 
-- 文件名：`spider_Dst03.py`
+- 文件名：`spider_Dst.py`
 - 数据网站：`http://wdc.kugi.kyoto-u.ac.jp/wdc/Sec3.html`
 - 更新速度：1小时更新一次数据
 - 存储路径：`./Dst/20xxxx.txt` 示例 `./SpaceWeather/Dst/202203.txt`
@@ -30,13 +30,13 @@ Washy 2022-03-24
 
 ## 太阳黑子数
 
-- 文件名：`spider_SunspotNumber02.py`
+- 文件名：`spider_SunspotNumber.py`
 - 数据网站：`ftp://ftp.swpc.noaa.gov/pub/indices/old_indices` 
 - 更新速度：1天更新一次数据
 - 存储路径：`./SunspotNumber/20xxxx.txt` 示例`./SpaceWeather/SunspotNumber/202203.txt`
 
 ## Gim Map
 
-- 文件名：`spider_GimMap01.py`
+- 文件名：`spider_GimMap.py`
 - 数据网站：`ftp://ftp.gipp.org.cn/product/ionex`
 - 存储路径：`./GimMap/20xx/xxx/.Z` 示例`./GimMap/2022/089/usrg0890.22i.Z`
