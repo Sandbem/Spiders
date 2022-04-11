@@ -1,5 +1,5 @@
 ''' coding: utf-8
-INFO: 爬取ftp://ftp.gipp.org.cn/product/ionex下Gim Map (usrg*i.Z)数据.
+INFO: 爬取ftp://ftp.gipp.org.cn/product/ionex下Gim Map (uqrg*i.Z)数据.
 date: 2022-03-31 Washy [CUG washy21@163.com]
 '''
 
@@ -67,13 +67,13 @@ def is_ftp_file(ftp_conn, filename):
 # author: Washy [CUG washy21@163.com]
 # date: 2022/03/31
 ##----------------------------------------------------------------------##
-def download_usrg(ftp, rootpath, iy, iday):
+def download_uqrg(ftp, rootpath, iy, iday):
     # 文件夹路径
     foldpath = '/product/ionex/{:d}/{:03d}'.format(iy,iday)
     # 文件名
-    filename = 'usrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
+    filename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 保存文件夹路径
-    savefoldpath = os.path.join(rootpath, 'GimMap/Z/{:d}/{:03d}'.format(iy,iday))
+    savefoldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
     # 保存文件绝对路径
     savepath = os.path.join(savefoldpath,filename)
 
@@ -110,7 +110,7 @@ def download_usrg(ftp, rootpath, iy, iday):
 # author: Washy [CUG washy21@163.com]
 # date: 2022/03/31
 ##----------------------------------------------------------------------##
-def download_usrg_all(rootpath):
+def download_uqrg_all(rootpath):
     # 连接服务器
     ftp = ftp_connect()
 
@@ -119,9 +119,9 @@ def download_usrg_all(rootpath):
 
     # 2021年至本年的前一年
     for iy in range(2021, utc.year):
-        for iday in range(1,366):
+        for iday in range(274,366):
             # 下载文件
-            download_usrg(ftp,rootpath,iy,iday)
+            download_uqrg(ftp,rootpath,iy,iday)
     
     # 下载本年数据
     doy = (utc-datetime.datetime(utc.year,1,1)).days
@@ -129,7 +129,7 @@ def download_usrg_all(rootpath):
     iy = utc.year
     for iday in range(1,doy+1):
         # 下载文件
-        download_usrg(ftp,rootpath,iy,iday)
+        download_uqrg(ftp,rootpath,iy,iday)
 
     # 断开服务器
     ftp.quit()
@@ -150,7 +150,7 @@ def resave_TEC(rootpath, iy, iday):
     zfoldpath = os.path.join(rootpath, 'Z', \
         '{:d}/{:03d}'.format(iy,iday))
     # 文件名
-    zfilename = 'usrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
+    zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 压缩文件绝对路径
     zfilepath = os.path.join(zfoldpath,zfilename)
 
@@ -212,7 +212,9 @@ def resave_TEC(rootpath, iy, iday):
     # 每个文件的数据行数
     rows_file = numLat*(rows_lat+1) + 3
     # 文件头描述信息行数
-    idx0 = 26
+    for idx in range(len(data)):
+        if "END OF HEADER" in data[idx]:
+            idx0 = idx + 1
 
     # 遍历文件名
     for ifile in range(96):#96
@@ -258,7 +260,7 @@ def resave_TEC_all(rootpath):
 
     # 2021年至本年的前一年
     for iy in range(2021, utc.year):
-        for iday in range(1,366):
+        for iday in range(274,366):
             # 
             try:
                 resave_TEC(rootpath,iy,iday)
@@ -266,7 +268,7 @@ def resave_TEC_all(rootpath):
             except:
                 print("ERROR: {:d}年第{:03d}天数据存储失败".format(iy,iday))
     
-    # 下载本年数据
+    # 存储本年数据
     doy = (utc-datetime.datetime(utc.year,1,1)).days
     # 当前年
     iy = utc.year
@@ -283,7 +285,7 @@ if __name__ == '__main__':
     # 存储根目录
     rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
     # 下载2021年至今的数据
-    download_usrg_all(rootpath)
+    download_uqrg_all(rootpath)
     resave_TEC_all(rootpath)
     
 
