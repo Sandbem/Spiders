@@ -147,18 +147,20 @@ def download_usrg_all(rootpath):
 ##----------------------------------------------------------------------##
 def resave_TEC(rootpath, iy, iday):
     # 文件夹路径
-    zfoldpath = os.path.join(rootpath, 'GimMap/Z', \
+    zfoldpath = os.path.join(rootpath, 'Z', \
         '{:d}/{:03d}'.format(iy,iday))
     # 文件名
     zfilename = 'usrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 压缩文件绝对路径
     zfilepath = os.path.join(zfoldpath,zfilename)
 
-    # 保存文件夹路径
-    savefoldpath = os.path.join(rootpath, 'GimMap/Data', \
-        '{:d}/{:03d}'.format(iy,iday))
     # 当前日期
     date = datetime.datetime(iy,1,1) + datetime.timedelta(days=iday-1)
+
+    # 保存文件夹路径
+    savefoldpath = os.path.join(rootpath, 'DATA/IonosphereWeather/TEC', \
+        '{:d}/{:02d}/{:02d}'.format(iy,date.month,date.day))
+    
     # HMS
     hms = ['0000', '0015', '0030', '0045', '0100', '0115', '0130', '0145', 
         '0200', '0215', '0230', '0245', '0300', '0315', '0330', '0345', 
@@ -174,8 +176,8 @@ def resave_TEC(rootpath, iy, iday):
         '2200', '2215', '2230', '2245', '2300', '2315', '2330', '2345']
     # 保存文件名
     savepaths = [savefoldpath + \
-        '/{:d}{:02d}{:02d}({:03d})'.format(iy,date.month,date.day,iday) \
-        + hms[i] + '00.txt' for i in range(96)]
+        '/Ass{:d}{:02d}{:02d}'.format(iy,date.month,date.day) \
+        + hms[i] + '00TEC.txt' for i in range(96)]
     
     # 已有的文件名
     filepaths = glob.glob(os.path.join(savefoldpath,'*.txt'))
@@ -279,7 +281,7 @@ def resave_TEC_all(rootpath):
 ##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 存储根目录
-    rootpath = '/Volumes/Washy5T/SpaceWeather'
+    rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
     # 下载2021年至今的数据
     download_usrg_all(rootpath)
     resave_TEC_all(rootpath)
