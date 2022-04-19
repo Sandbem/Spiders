@@ -217,7 +217,7 @@ def resave_TEC(rootpath, iy, iday):
             idx0 = idx + 1
 
     # 遍历文件名
-    for ifile in range(96):#96
+    for ifile in range(1):#96
         # 本文件数据范围
         data1 = data[rows_file*ifile+idx0+2:rows_file*(ifile+1)+idx0-1]
         f = open(savepaths[ifile], 'w')
@@ -243,7 +243,7 @@ def resave_TEC(rootpath, iy, iday):
         f.close()
 
 ##----------------------------------------------------------------------##
-# INFO: 重新存储2021年至今的TEC数据
+# INFO: 重新存储2021年至今的TEC数据至txt文件
 ##----------------------------------------------------------------------##
 # Inputs:
 #   rootpath    - 根目录
@@ -281,12 +281,24 @@ def resave_TEC_all(rootpath):
             print("ERROR: {:d}年第{:03d}天数据存储失败".format(iy,iday))
 
 ##----------------------------------------------------------------------##
+# INFO: 对指定经纬度范围的txt数据进行插值处理。
+##----------------------------------------------------------------------##
+# Inputs:
+#   rootpath    - 根目录
+##----------------------------------------------------------------------##
+# author: Washy [CUG washy21@163.com]
+# date: 2022/04/19
+##----------------------------------------------------------------------##
+def inter_TEC(rootpath,iy,imon,iday):
+    pass
+
+##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 存储根目录
     rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
     # 下载2021年至今的数据
-    download_uqrg_all(rootpath)
-    resave_TEC_all(rootpath)
+    # download_uqrg_all(rootpath)
+    # resave_TEC_all(rootpath)
     
 
 
