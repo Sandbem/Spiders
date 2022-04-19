@@ -10,8 +10,11 @@ import socket
 import pathlib
 import datetime
 
+import numpy as np
+
 from ftplib import FTP
 from ftplib import error_perm
+from scipy.interpolate import griddata
 
 ##----------------------------------------------------------------------##
 # INFO: ftp网站连接
@@ -143,7 +146,7 @@ def download_uqrg_all(rootpath):
 #   iday        - Day of Year
 ##----------------------------------------------------------------------##
 # author: Washy [CUG washy21@163.com]
-# date: 2022/03/31，04/01
+# date: 2022/03/31，04/01,19
 ##----------------------------------------------------------------------##
 def resave_TEC(rootpath, iy, iday):
     # 文件夹路径
@@ -206,6 +209,9 @@ def resave_TEC(rootpath, iy, iday):
     DLON = float(data[22][14:20])
     LONs = [LON1+DLON*i for i in range(int((LON2-LON1)/DLON)+1)]
     numLon = len(LONs)
+
+    plons1,plats1 = np.meshgrid(LONs,LATs)
+    plons2,plats2 = np.meshgrid(np.arange(70,136),np.arange(10,56))
     
     # 每个纬度对应的数据行数
     rows_lat = int((numLon-1)/16) + 1
@@ -217,9 +223,29 @@ def resave_TEC(rootpath, iy, iday):
             idx0 = idx + 1
 
     # 遍历文件名
-    for ifile in range(1):#96
+    for ifile in range(96):#96
+        # 
+        npdata1 = np.zeros([numLat,numLon])
         # 本文件数据范围
         data1 = data[rows_file*ifile+idx0+2:rows_file*(ifile+1)+idx0-1]
+        # 遍历纬度
+        for ilat in range(numLat):#numLat
+            # 本纬度的数据范围
+            data2 = ''.join(
+                data1[(rows_lat+1)*ilat+1:(rows_lat+1)*(ilat+1)]
+            ).split()
+            # 遍历经度
+            npdata1[ilat,:] = data2
+
+        # 数据插值
+        npdata2 = griddata((plons1.flatten(),plats1.flatten()),npdata1.flatten(),
+            (plons2,plats2),method='cubic')
+        
+        fplons2 = plons2.flatten()
+        fplats2 = plats2.flatten()
+        fpdata2 = npdata2.flatten()
+
+        # 存储数据
         f = open(savepaths[ifile], 'w')
         f.write("# Date: {:d}-{:02d}-{:02d} {}:{}:00\n".format(
             iy,date.month,date.day,hms[ifile][0:2],hms[ifile][2:4]
@@ -227,18 +253,12 @@ def resave_TEC(rootpath, iy, iday):
         f.write("# Ionospheric TEC Parameter\n")
         f.write("# TEC values in 0.1 TECUs; {}km\n".format(HGT))
         f.write("#----------------------------------------\n")
-        f.write("  Long    Lat  TEC\n")
-        # 遍历纬度
-        for ilat in range(numLat):#numLat
-            # 本纬度的数据范围
-            data2 = ''.join(data1[(rows_lat+1)*ilat+1:\
-                (rows_lat+1)*(ilat+1)]).split()
-            # 遍历经度
-            for ilon in range(numLon):
-                # 存储数据
-                f.write("{:6.1f} {:6.1f} {:4d}\n".format(
-                    LONs[ilon],LATs[ilat],int(data2[ilon])
-                ))
+        f.write("  Long    Lat    TEC\n")
+
+        for idx in range(len(fpdata2)):
+            f.write("{:6.1f} {:6.1f} {:6.1f}\n".format(
+                fplons2[idx],fplats2[idx],fpdata2[idx]
+            ))
 
         f.close()
 
@@ -281,24 +301,12 @@ def resave_TEC_all(rootpath):
             print("ERROR: {:d}年第{:03d}天数据存储失败".format(iy,iday))
 
 ##----------------------------------------------------------------------##
-# INFO: 对指定经纬度范围的txt数据进行插值处理。
-##----------------------------------------------------------------------##
-# Inputs:
-#   rootpath    - 根目录
-##----------------------------------------------------------------------##
-# author: Washy [CUG washy21@163.com]
-# date: 2022/04/19
-##----------------------------------------------------------------------##
-def inter_TEC(rootpath,iy,imon,iday):
-    pass
-
-##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 存储根目录
     rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
     # 下载2021年至今的数据
-    # download_uqrg_all(rootpath)
-    # resave_TEC_all(rootpath)
+    download_uqrg_all(rootpath)
+    resave_TEC_all(rootpath)
     
 
 
