@@ -241,9 +241,9 @@ def resave_TEC(rootpath, iy, iday):
         npdata2 = griddata((plons1.flatten(),plats1.flatten()),npdata1.flatten(),
             (plons2,plats2),method='cubic')
         
-        fplons2 = plons2.flatten()
-        fplats2 = plats2.flatten()
-        fpdata2 = npdata2.flatten()
+        fplons2 = plons2.T.flatten()
+        fplats2 = plats2.T.flatten()
+        fpdata2 = npdata2.T.flatten()
 
         # 存储数据
         f = open(savepaths[ifile], 'w')
