@@ -122,6 +122,10 @@ def unpack_Z(rootpath,iy,iday):
     # 保存文件绝对路径
     filepath = os.path.join(foldpath,filename)
     zfilepath = os.path.join(foldpath,zfilename)
+    
+    if not os.path.exists(zfilepath):
+        return
+    
     # 判断是否存在
     if not os.path.exists(filepath):
         data = unlzw3.unlzw(pathlib.Path(zfilepath))
