@@ -105,6 +105,35 @@ def download_uqrg(ftp, rootpath, iy, iday):
         os.rmdir(savefoldpath)
 
 ##----------------------------------------------------------------------##
+# INFO: 解压Z文件
+##----------------------------------------------------------------------##
+# Inputs:
+#   rootpath    - 根目录
+##----------------------------------------------------------------------##
+# author: Washy [CUG washy21@163.com]
+# date: 2022/05/07
+##----------------------------------------------------------------------##
+def unpack_Z(rootpath,iy,iday):
+    # 文件名
+    filename = 'uqrg{:03d}0.{:02d}i'.format(iday,iy%100)
+    zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
+    # 保存文件夹路径
+    foldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
+    # 保存文件绝对路径
+    filepath = os.path.join(foldpath,filename)
+    zfilepath = os.path.join(foldpath,zfilename)
+    
+    if not os.path.exists(zfilepath):
+        return
+    
+    # 判断是否存在
+    if not os.path.exists(filepath):
+        data = unlzw3.unlzw(pathlib.Path(zfilepath))
+        
+        with open(filepath,'wb') as f:
+            f.write(data)
+
+##----------------------------------------------------------------------##
 # INFO: 下载2021年至今所有的ursg*i.Z文件
 ##----------------------------------------------------------------------##
 # Inputs:
@@ -125,6 +154,9 @@ def download_uqrg_all(rootpath):
         for iday in range(274,366):
             # 下载文件
             download_uqrg(ftp,rootpath,iy,iday)
+            # 解压文件
+            unpack_Z(rootpath,iy,iday)
+            
     
     # 下载本年数据
     doy = (utc-datetime.datetime(utc.year,1,1)).days
@@ -133,6 +165,8 @@ def download_uqrg_all(rootpath):
     for iday in range(1,doy+1):
         # 下载文件
         download_uqrg(ftp,rootpath,iy,iday)
+        # 解压文件
+        unpack_Z(rootpath,iy,iday)
 
     # 断开服务器
     ftp.quit()
@@ -303,7 +337,7 @@ def resave_TEC_all(rootpath):
 ##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 存储根目录
-    rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
+    rootpath = '/Volumes/个人文件夹/Washy/SpaceWeather/GimMap'
     # 下载2021年至今的数据
     download_uqrg_all(rootpath)
     resave_TEC_all(rootpath)
