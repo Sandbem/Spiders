@@ -31,9 +31,9 @@ def get_Dst_month(year, month):
     # 判断year month属于哪个文件夹
     if year>=1957 and year<=2014:
         dst_version = 'dst_final'
-    elif year>=2015 and year<=2019:
+    elif year>=2015 and year<=2020:
         dst_version = 'dst_provisional'
-    elif year>=2020:
+    elif year>=2021:
         dst_version = 'dst_realtime'
     else:
         print('ERROR: Data Not Found!')
@@ -99,20 +99,22 @@ def save_Dst(filepath, data):
 # date: 2022/03/22,23
 ##----------------------------------------------------------------------##
 def download_Dst_all(rootpath):
-    # 文件夹路径
-    folderpath = os.path.join(rootpath, 'Dst/Data')
-    # 创建文件夹
-    if not os.path.exists(folderpath):
-        os.makedirs(folderpath)
     # 获取当前时间
     date = datetime.datetime.utcnow()
     # 下载所有的历史数据 1957-?
     for year in range(2018, date.year):
+        # 存储文件夹
+        foldpath = os.path.join(rootpath, "%d"%year)
+        # 创建文件夹
+        if not os.path.exists(foldpath):
+            os.makedirs(foldpath)
+        
+        # 循环月份
         for month in range(1,13):
             # 生成文件名
             filename = "{:d}{:02d}.txt".format(year,month)
             # 生成文件绝对路径
-            filepath = os.path.join(folderpath, filename)
+            filepath = os.path.join(foldpath, filename)
             # 文件已存在则跳过
             if os.path.exists(filepath):
                 print("文件已存在: " + filename)
@@ -125,12 +127,18 @@ def download_Dst_all(rootpath):
             # 存储数据
             save_Dst(filepath, data)
     
+    # 存储文件夹
+    foldpath = os.path.join(rootpath, "%d"%date.year)
+    # 创建文件夹
+    if not os.path.exists(foldpath):
+        os.makedirs(foldpath)
+
     # 下载本年数据
     for month in range(1,date.month+1):
         # 生成文件名
         filename = "{:d}{:02d}.txt".format(date.year,month)
         # 生成文件绝对路径
-        filepath = os.path.join(folderpath, filename)
+        filepath = os.path.join(foldpath, filename)
         # 提示信息
         print("正在下载: " + filename)
         time.sleep(1)
@@ -142,6 +150,6 @@ def download_Dst_all(rootpath):
 ##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 根目录
-    rootpath = '/Volumes/Washy5T/SpaceWeather'
+    rootpath = '/Volumes/Washy5T/SpaceWeather/Dst'
     # 主函数
     download_Dst_all(rootpath)
