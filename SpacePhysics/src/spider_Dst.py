@@ -81,8 +81,8 @@ def save_Dst(filepath, data):
             # 获取一天的数据
             ddata = data[idx*101:(idx+1)*101]
             # 构造每4个字符一个数据的格式
-            ddata = '  ' + ddata[:2] + ddata[3:35] + ddata[36:69] + \
-                ddata[70:]
+            ddata = '  ' + ddata[:2] + ddata[3:35] + ddata[36:68] + \
+                ddata[69:]
             
             for i  in range(25):
                 f.write('%4s ' % ddata[i*4:(i+1)*4])
