@@ -87,22 +87,22 @@ def download_uqrg(ftp, rootpath, iy, iday):
     # ftp跳转路径
     try:
         ftp.cwd(foldpath)
-        # 创建文件夹
-        if not os.path.exists(savefoldpath):
-            os.makedirs(savefoldpath)
     except:
         print('文件夹' + foldpath + '不存在!')
     
     # FTP: 文件名是否存在
     if is_ftp_file(ftp, filename):
         print('正在下载{:d}第{:03d}天数据'.format(iy,iday))
+        
+        # 创建文件夹
+        if not os.path.exists(savefoldpath):
+            os.makedirs(savefoldpath)
+        
         # 下载指定文件到临时文件
         with open(savepath, 'wb') as f:
             ftp.retrbinary('RETR ' + filename, f.write, 1024)
     else:
         print('文件' + filename + '不存在!')
-        # 移除文件夹
-        os.rmdir(savefoldpath)
 
 ##----------------------------------------------------------------------##
 # INFO: 解压Z文件
@@ -114,11 +114,11 @@ def download_uqrg(ftp, rootpath, iy, iday):
 # date: 2022/05/07
 ##----------------------------------------------------------------------##
 def unpack_Z(rootpath,iy,iday):
+    # 保存文件夹路径
+    foldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
     # 文件名
     filename = 'uqrg{:03d}0.{:02d}i'.format(iday,iy%100)
     zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
-    # 保存文件夹路径
-    foldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
     # 保存文件绝对路径
     filepath = os.path.join(foldpath,filename)
     zfilepath = os.path.join(foldpath,zfilename)
@@ -149,24 +149,24 @@ def download_uqrg_all(rootpath):
     # 获取当前世界时
     utc = datetime.datetime.utcnow()
 
-    # 2021年至本年的前一年
-    for iy in range(2021, utc.year):
-        for iday in range(274,366):
+    # 倒叙 year
+    for iy in range(utc.year,2020,-1):
+        if iy == utc.year:
+            sday = (utc-datetime.datetime(utc.year,1,1)).days + 1
+            eday = 0
+        elif iy == 2021:
+            sday = 365
+            eday = 273
+        else:
+            sday = 365
+            eday = 0
+        
+        # 倒叙 DoY
+        for iday in range(sday,eday,-1):
             # 下载文件
             download_uqrg(ftp,rootpath,iy,iday)
             # 解压文件
             unpack_Z(rootpath,iy,iday)
-            
-    
-    # 下载本年数据
-    doy = (utc-datetime.datetime(utc.year,1,1)).days
-    # 当前年
-    iy = utc.year
-    for iday in range(1,doy+1):
-        # 下载文件
-        download_uqrg(ftp,rootpath,iy,iday)
-        # 解压文件
-        unpack_Z(rootpath,iy,iday)
 
     # 断开服务器
     ftp.quit()
@@ -190,6 +190,10 @@ def resave_TEC(rootpath, iy, iday):
     zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 压缩文件绝对路径
     zfilepath = os.path.join(zfoldpath,zfilename)
+    # 判断压缩文件是否存在
+    if not os.path.exists(zfilepath):
+        print("无数据")
+        return
 
     # 当前日期
     date = datetime.datetime(iy,1,1) + datetime.timedelta(days=iday-1)
@@ -219,7 +223,8 @@ def resave_TEC(rootpath, iy, iday):
     # 已有的文件名
     filepaths = glob.glob(os.path.join(savefoldpath,'*.txt'))
     # 所有文件已存在则终止
-    if set(savepaths) <= set(filepaths):
+    if set(savepaths)<=set(filepaths):
+        print("数据文件已存在")
         return
     
     # 创建文件夹
@@ -312,32 +317,30 @@ def resave_TEC_all(rootpath):
     # 获取当前世界时
     utc = datetime.datetime.utcnow()
 
-    # 2021年至本年的前一年
-    for iy in range(2021, utc.year):
-        for iday in range(274,366):
-            # 
+    # 倒叙 year
+    for iy in range(utc.year,2020,-1):
+        if iy == utc.year:
+            sday = (utc-datetime.datetime(utc.year,1,1)).days + 1
+            eday = 0
+        elif iy == 2021:
+            sday = 365
+            eday = 273
+        else:
+            sday = 365
+            eday = 0
+        
+        # 倒叙 DoY
+        for iday in range(sday,eday,-1):
             try:
+                print("正在存储{:d}年第{:03d}天数据".format(iy,iday))
                 resave_TEC(rootpath,iy,iday)
-                print("{:d}年第{:03d}天数据存储完成".format(iy,iday))
             except:
                 print("ERROR: {:d}年第{:03d}天数据存储失败".format(iy,iday))
-    
-    # 存储本年数据
-    doy = (utc-datetime.datetime(utc.year,1,1)).days
-    # 当前年
-    iy = utc.year
-    for iday in range(1,doy+1):
-        # 
-        try:
-            resave_TEC(rootpath,iy,iday)
-            print("{:d}年第{:03d}天数据存储完成".format(iy,iday))
-        except:
-            print("ERROR: {:d}年第{:03d}天数据存储失败".format(iy,iday))
 
 ##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 存储根目录
-    rootpath = '/Volumes/个人文件夹/Washy/SpaceWeather/GimMap'
+    rootpath = '/Volumes/Washy5T/SpaceWeather/GimMap'
     # 下载2021年至今的数据
     download_uqrg_all(rootpath)
     resave_TEC_all(rootpath)

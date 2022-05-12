@@ -150,6 +150,6 @@ def download_Dst_all(rootpath):
 ##----------------------------------------------------------------------##
 if __name__ == '__main__':
     # 根目录
-    rootpath = '/Volumes/Washy5T/SpaceWeather/Dst'
+    rootpath = '/Volumes/Washy5T/SpaceWeather/Data/Dst'
     # 主函数
     download_Dst_all(rootpath)
