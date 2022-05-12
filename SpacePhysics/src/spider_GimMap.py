@@ -76,7 +76,8 @@ def download_uqrg(ftp, rootpath, iy, iday):
     # 文件名
     filename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 保存文件夹路径
-    savefoldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
+    savefoldpath = os.path.join(rootpath, \
+        'TEMP/Z/{:d}/{:03d}'.format(iy,iday))
     # 保存文件绝对路径
     savepath = os.path.join(savefoldpath,filename)
 
@@ -115,7 +116,8 @@ def download_uqrg(ftp, rootpath, iy, iday):
 ##----------------------------------------------------------------------##
 def unpack_Z(rootpath,iy,iday):
     # 保存文件夹路径
-    foldpath = os.path.join(rootpath, 'Z/{:d}/{:03d}'.format(iy,iday))
+    foldpath = os.path.join(rootpath, \
+        'TEMP/Z/{:d}/{:03d}'.format(iy,iday))
     # 文件名
     filename = 'uqrg{:03d}0.{:02d}i'.format(iday,iy%100)
     zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
@@ -184,8 +186,8 @@ def download_uqrg_all(rootpath):
 ##----------------------------------------------------------------------##
 def resave_TEC(rootpath, iy, iday):
     # 文件夹路径
-    zfoldpath = os.path.join(rootpath, 'Z', \
-        '{:d}/{:03d}'.format(iy,iday))
+    zfoldpath = os.path.join(rootpath, \
+        'TEMP/Z/{:d}/{:03d}'.format(iy,iday))
     # 文件名
     zfilename = 'uqrg{:03d}0.{:02d}i.Z'.format(iday,iy%100)
     # 压缩文件绝对路径
@@ -199,8 +201,8 @@ def resave_TEC(rootpath, iy, iday):
     date = datetime.datetime(iy,1,1) + datetime.timedelta(days=iday-1)
 
     # 保存文件夹路径
-    savefoldpath = os.path.join(rootpath, 'DATA/IonosphereWeather/TEC', \
-        '{:d}/{:02d}/{:02d}'.format(iy,date.month,date.day))
+    savefoldpath = os.path.join(rootpath, \
+        'TEC/{:d}/{:02d}/{:02d}'.format(iy,date.month,date.day))
     
     # HMS
     hms = ['0000', '0015', '0030', '0045', '0100', '0115', '0130', '0145', 
@@ -300,6 +302,9 @@ def resave_TEC(rootpath, iy, iday):
             ))
 
         f.close()
+    
+    # 打印提示
+    print("存储完成")
 
 ##----------------------------------------------------------------------##
 # INFO: 重新存储2021年至今的TEC数据至txt文件
